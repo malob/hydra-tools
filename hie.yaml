@@ -1,0 +1,7 @@
+cradle:
+  stack:
+    - path: "./app/Main.hs"
+      component: "hydra-tools:exe:hydra-tools"
+
+    - path: "./src/HydraScraper.hs"
+      component: "hydra-tools:lib"
