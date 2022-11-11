@@ -1,0 +1,56 @@
+name: "CI"
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  nix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'ubuntu-22.04', 'macos-12' ]
+
+    runs-on: ${{ matrix.os }}
+    name: Nix build and cache (${{ matrix.os }})
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Install Nix
+      uses: cachix/install-nix-action@v18
+      with:
+        extra_nix_config: |
+          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Cachix
+      uses: cachix/cachix-action@v12
+      with:
+        name: malo
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+
+    - name: Build package
+      run: |
+        nix -L build
+
+    - name: Build devshell
+      run: |
+        nix -L develop
+
+  stack:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'ubuntu-22.04', 'macos-12' ]
+
+    runs-on: ${{ matrix.os }}
+    name: Stack build (${{ matrix.os }})
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Build package
+      run: |
+        stack build
