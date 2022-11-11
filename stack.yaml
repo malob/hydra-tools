@@ -1,7 +1,10 @@
+# When updating resolver, ensure GHC version used in `./stack.yaml` and `./flake.nix` stay in sync.
+# GHC 9.0.2
 resolver: lts-19.32
 
 packages:
 - .
 
 nix:
-  packages: [zlib]
+  pure: true
+  shell-file: ./stack.nix

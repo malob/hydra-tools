@@ -1,2 +1,6 @@
+# Stack related
 .stack-work/
 *~
+
+# Nix related
+result*
