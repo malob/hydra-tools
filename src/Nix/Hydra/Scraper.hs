@@ -109,14 +109,14 @@ buildsForEval eid =
           (\b -> (buildId b, b)) <$> inSerial buildScraper
 
     buildScraper :: SerialScraper String Build
-    buildScraper = do
-      status <- seekNext $ attr "title" ("td" // "img")
-      bid <- read <$> seekNext (text "td")
-      jname <- seekNext $ text "td"
-      time <- seekNext timeScraper
-      pname <- seekNext $ text "td"
-      sys <- seekNext $ text "td"
-      pure $ Build status bid jname time pname sys
+    buildScraper =
+      Build
+        <$> seekNext (attr "title" ("td" // "img"))
+        <*> (read <$> seekNext (text "td"))
+        <*> seekNext (text "td")
+        <*> seekNext timeScraper
+        <*> seekNext (text "td")
+        <*> seekNext (text "td")
 
     timeScraper :: Scraper String (Maybe UnixTime)
     timeScraper = readMaybe <$> (attr "data-timestamp" ("td" // "time") <|> text "td")
@@ -162,8 +162,7 @@ problemDeps bs = foldr go (lift mempty) buildsWithFailedDeps
 evalInfo :: EvalId -> MaybeT IO EvalInfo
 evalInfo eid = do
   bs <- buildsForEval eid
-  pds <- problemDeps bs
-  pure $ EvalReport eid bs pds
+  EvalReport eid bs <$> problemDeps bs
 
 -- | Runs `evalInfo` and converts the output to JSON.
 evalInfoJson :: EvalId -> IO (Maybe ByteString)
