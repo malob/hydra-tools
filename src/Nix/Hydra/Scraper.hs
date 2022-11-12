@@ -15,6 +15,8 @@ import Data.List (stripPrefix)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust)
+import Data.Set (Set)
+import qualified Data.Set as Set
 import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
 import Text.HTML.Scalpel
@@ -58,7 +60,7 @@ data Build = Build
     -- | The system of the package, e.g., @aarch64-linux@.
     buildSystem :: String
   }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 instance ToJSON Build where
   toEncoding =
@@ -74,12 +76,12 @@ type Builds = Map BuildId Build
 
 -- | Type alias used to make function signatures more readable.
 --
--- The `BuildId` is the ID of a failed build and [`Build`] are the builds that depended on that
+-- The `BuildId` is the ID of a failed build and `Set` `BuildId` are the builds that depended on that
 -- build.
-type ProblemDeps = Map BuildId [Build]
+type ProblemDeps = Map BuildId (Set BuildId)
 
 -- | Information for a Hydra jobset evaluation.
-data EvalInfo = EvalReport
+data EvalInfo = EvalInfo
   { -- | The ID of the jobset evaluation, e.g., @1784238@.
     evalId :: EvalId,
     -- | The builds jobs in for the jobset evaluation.
@@ -87,7 +89,7 @@ data EvalInfo = EvalReport
     -- | Problematic dependencies, i.e., builds that other builds depend on that failed.
     evalProblemdeps :: ProblemDeps
   }
-  deriving (Eq, Show, Generic)
+  deriving (Eq, Ord, Show, Generic)
 
 instance ToJSON EvalInfo where
   toEncoding =
@@ -152,7 +154,7 @@ problemDeps bs = foldr go (lift mempty) buildsWithFailedDeps
     go :: Build -> MaybeT IO ProblemDeps -> MaybeT IO ProblemDeps
     go b pds =
       failedDepIdForBuild (buildId b) >>= \case
-        Just bid -> M.insertWith (<>) bid [b] <$> pds
+        Just bid -> M.insertWith (<>) bid (Set.singleton $ buildId b) <$> pds
         Nothing -> pds
 
     buildsWithFailedDeps :: Builds
@@ -162,7 +164,7 @@ problemDeps bs = foldr go (lift mempty) buildsWithFailedDeps
 evalInfo :: EvalId -> MaybeT IO EvalInfo
 evalInfo eid = do
   bs <- buildsForEval eid
-  EvalReport eid bs <$> problemDeps bs
+  EvalInfo eid bs <$> problemDeps bs
 
 -- | Runs `evalInfo` and converts the output to JSON.
 evalInfoJson :: EvalId -> IO (Maybe ByteString)
