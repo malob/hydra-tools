@@ -12,8 +12,8 @@ import Data.Aeson.Types (genericToEncoding)
 import Data.ByteString.Lazy (ByteString)
 import Data.Char (toLower)
 import Data.List (stripPrefix)
-import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust)
 import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
