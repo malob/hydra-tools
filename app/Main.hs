@@ -5,7 +5,7 @@ module Main (main) where
 
 import Data.Maybe (fromMaybe)
 import qualified Data.ByteString.Lazy as BS
-import HydraScraper (evalInfoJson)
+import Nix.Hydra.Scraper (evalInfoJson)
 import System.Environment (getArgs)
 
 main :: IO ()

@@ -2,7 +2,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module HydraScraper where
+module Nix.Hydra.Scraper where
 
 import Control.Applicative ((<|>))
 import Control.Monad.Trans.Class (lift)

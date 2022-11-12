@@ -3,5 +3,5 @@ cradle:
     - path: "./app/Main.hs"
       component: "hydra-tools:exe:hydra-tools"
 
-    - path: "./src/HydraScraper.hs"
+    - path: "./src/Nix/Hydra/Scraper.hs"
       component: "hydra-tools:lib"

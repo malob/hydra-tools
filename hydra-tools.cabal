@@ -25,7 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      HydraScraper
+      Nix.Hydra.Scraper
   other-modules:
       Paths_hydra_tools
   hs-source-dirs:
