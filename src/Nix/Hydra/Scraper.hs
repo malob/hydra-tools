@@ -19,6 +19,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import GHC.Generics (Generic)
 import Numeric.Natural (Natural)
+import System.IO (hPutStrLn, stderr)
 import Text.HTML.Scalpel
 import Text.Read (readMaybe)
 import Text.Regex.Posix ((=~))
@@ -163,7 +164,9 @@ problemDeps bs = foldr go (lift mempty) buildsWithFailedDeps
 -- | Gives information for a Hydra jobset evaluation.
 evalInfo :: EvalId -> MaybeT IO EvalInfo
 evalInfo eid = do
+  lift $ hPutStrLn stderr "Collecting build information ..."
   bs <- buildsForEval eid
+  lift $ hPutStrLn stderr "Finding problematic dependencies ..."
   EvalInfo eid bs <$> problemDeps bs
 
 -- | Runs `evalInfo` and converts the output to JSON.
